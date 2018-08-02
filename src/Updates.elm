@@ -1,7 +1,8 @@
 module Updates exposing (..)
 
 import String exposing (startsWith)
-import Types.Models exposing (Model, Msg(..))
+import Types.Models exposing (Model, Msg(..), initModel)
+import Utils.Utils exposing (calculateWPM)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -12,11 +13,30 @@ update msg model =
       if List.isEmpty model.remainWords then
         ({ model | currentWord = inputWord}, Cmd.none)
       else if matchEntireWord inputWord model.remainWords then
-        (Model True False (model.typedWords ++ [inputWord]) (List.drop 1 model.remainWords) "", Cmd.none)
+        let
+          typedWords = model.typedWords ++ [inputWord]
+        in
+          ({ model | correct = True
+                   , typedWords = typedWords
+                   , remainWords = (List.drop 1 model.remainWords)
+                   , wpm = calculateWPM typedWords model.secondsPassed
+                   , currentWord = ""}, Cmd.none)
       else if matchStart inputWord model.remainWords then
-        (Model True False model.typedWords model.remainWords inputWord, Cmd.none)
+        ({ model | correct = True
+                 , pristine = False
+                 , currentWord = inputWord}, Cmd.none)
       else
-        (Model False False model.typedWords model.remainWords inputWord, Cmd.none)
+        ({ model | correct = False
+                 , pristine = False
+                 , currentWord = inputWord}, Cmd.none)
+    OneSecondPassed _ ->
+      let
+        seconds = model.secondsPassed + 1
+        wpm = calculateWPM model.typedWords seconds
+      in
+        ({ model | secondsPassed = seconds, wpm = wpm}, Cmd.none)
+    Reset ->
+        (initModel, Cmd.none)
 
 matchStart : String -> List String -> Bool
 matchStart inputWord remainWords =

@@ -8,12 +8,8 @@ import Types.Models exposing (Model, Msg)
 view : Model -> Html Msg
 view model =
   div [ class "ui center aligned grid" ]
-      [ div [ class "fourteen wide computer fifteen wide tablet sixteen wide mobile column" ]
-          [ div [ class "ui stackable menu" ]
-             [ a [ class "item" ] [ text "Item1" ]
-             , a [ class "item" ] [ text "Item2" ]
-             ]
-          , div [ class "ui segment" ]
+      [ div [ class "sixteen wide computer sixteen wide tablet sixteen wide mobile column" ]
+          [ div [ class "ui segment" ]
              [ Home.view model ]
           ]
       ]
