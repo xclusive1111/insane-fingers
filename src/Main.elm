@@ -4,7 +4,6 @@ import Html exposing (Html)
 import Time exposing (second)
 import Types.Models exposing (Model, Msg(..), initModel)
 import Updates exposing (update)
-import Utils.Utils exposing (splitString)
 import Views exposing (view)
 
 init : (Model, Cmd Msg)
@@ -19,7 +18,7 @@ subscriptions model =
   if model.pristine || List.isEmpty model.remainWords then
     Sub.none
   else
-    Time.every second OneSecondPassed
+    Time.every second OnSecondPassed
 
 main : Program Never Model Msg
 main =

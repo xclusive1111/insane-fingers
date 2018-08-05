@@ -22,8 +22,22 @@ calculateWPM wordsTyped secondsPassed =
   if secondsPassed == 0 then
     0
   else
-    let
-      characters = List.map String.length wordsTyped |> List.sum
-      words = (toFloat characters) / 5.0
-    in
-      round (words / ((toFloat secondsPassed) /  60.0))
+    countCharacters wordsTyped
+      |> (\characterCnt -> (toFloat characterCnt) / 5.0)
+      |> (\wordCnt -> wordCnt / ((toFloat secondsPassed) /  60.0))
+      |> round
+
+countCharacters : List String -> Int
+countCharacters xs =
+  List.sum <| List.map String.length xs
+
+calcTypingAccuracy : Int -> Int -> Float
+calcTypingAccuracy mistakes totalCharacters =
+  let
+    accuracyStr = toString <| 100 - ((toFloat mistakes) / (toFloat totalCharacters) * 100)
+    num = case String.split(".") accuracyStr of
+            [a, b] -> a ++ "." ++ (String.slice 0 1 b)
+            [a]    -> a
+            _      -> "0"
+  in
+    Result.withDefault 0.0 (String.toFloat num)

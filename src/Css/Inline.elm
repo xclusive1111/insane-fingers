@@ -4,7 +4,7 @@ import Types.Models exposing (Styles)
 
 typingWord : Styles
 typingWord =
-    [("font-size", "2.2em"), ("line-height", "1.6em"), ("font-family", "Times New Roman, Times, serif")]
+    [("font-size", "1.8em"), ("line-height", "1.6em"), ("font-family", "Times New Roman, Times, serif")]
 
 positiveWord : Styles
 positiveWord = [("color", "green")] ++ roundCorner

@@ -1,11 +1,12 @@
 module Pages.Home exposing (..)
 
 import Css.Inline exposing (currentWord, negativeWord, positiveWord, typingWord)
-import Html exposing (Html, a, button, div, h1, i, img, input, span, text)
+import Html exposing (Html, a, button, div, h1, i, img, input, p, span, text)
 import Html.Attributes exposing (class, id, src, style, type_, value)
 import Html.Events exposing (onClick, onInput)
+import Set
 import Types.Models exposing (Model, Msg(..), Styles)
-import Utils.Utils exposing (calculatePercent, calculateWPM)
+import Utils.Utils exposing (calcTypingAccuracy, calculatePercent, calculateWPM, countCharacters)
 
 view : Model -> Html Msg
 view model =
@@ -15,15 +16,36 @@ view model =
           , div [ class "ui segment", style typingWord ] (getTypingWords model)
           ]
       , div [ class "eight wide computer sixteen wide mobile column" ]
-          [ typingInput model.currentWord OnTyping
+          [ typingSection model
           ]
+      ]
+
+typingSection : Model -> Html Msg
+typingSection model =
+    if List.isEmpty model.remainWords then
+      statsSection model
+    else
+      typingInput model.currentWord OnTyping
+
+statsSection : Model -> Html Msg
+statsSection model =
+  let
+      wpm = toString model.wpm
+      acc = toString <| calcTypingAccuracy (Set.fromList model.failedIndices |> Set.size) (List.length model.typedWords)
+  in
+    div [ class "" ]
+      [ p [] [ text ("Your speed: " ++ wpm ++ "WPM")]
+      , p [] [ text ("Accuracy: " ++ acc ++ "%" )]
+      , p [] [ text ("Time: " ++ (toString model.secondsPassed) ++ " s")]
+      , button [ class "ui icon button", onClick Reset ]
+          [ i [ class "big refresh icon" ] [] ]
       ]
 
 typingInput : String -> (String -> Msg) -> Html Msg
 typingInput str f =
   div [ class "ui fluid huge input" ]
     [ input [ type_ "text", value str,  onInput f ] []
-    , button [ class "ui teal icon button", onClick Reset ]
+    , button [ class "ui icon button", onClick Reset ]
         [ i [ class "big refresh icon" ] [] ]
     ]
 
