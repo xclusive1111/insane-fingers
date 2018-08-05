@@ -1,14 +1,14 @@
 module Types.Models exposing (..)
 
+import RemoteData exposing (WebData)
 import Time exposing (Time)
-import Utils.Utils exposing (splitString)
 
 type alias Word = String
 type alias SecondsPassed = Int
 type alias FailedIndex = Int
 type alias WPM = Int
 
-type alias Model =
+type alias TypingStats =
     { correct : Bool
     , pristine : Bool
     , typedWords : List Word
@@ -19,26 +19,87 @@ type alias Model =
     , failedIndices: List FailedIndex
     }
 
+type alias Model =
+    { typingStats: TypingStats
+    , wordList: WebData (List Word)
+    }
+
 type Msg
-    = NoOp
-    | OnTyping Word
+    = OnTyping Word
     | OnSecondPassed Time
+    | OnFetchWords (WebData (List Word))
+    | OnWordsGenerated (Maybe (List Word))
     | Reset
 
 type alias Styles = List (String, String)
 
+setTypingStats : TypingStats -> Model -> Model
+setTypingStats stats model =
+  { model | typingStats = stats }
+
+setCorrect : Bool -> TypingStats -> TypingStats
+setCorrect bool typingStats =
+  { typingStats | correct = bool }
+
+setTypedWords : List Word -> TypingStats -> TypingStats
+setTypedWords wordList typingStats =
+  { typingStats | typedWords = wordList }
+
+setRemainWords : List Word -> TypingStats -> TypingStats
+setRemainWords wordList typingStats =
+  { typingStats | remainWords = wordList }
+
+setWPM : WPM -> TypingStats -> TypingStats
+setWPM wpm typingStats =
+  { typingStats | wpm = wpm }
+
+setCurrentWord : Word -> TypingStats -> TypingStats
+setCurrentWord word typingStats =
+  { typingStats | currentWord = word }
+
+setPristine : Bool -> TypingStats -> TypingStats
+setPristine bool typingStats =
+  { typingStats | pristine = bool }
+
+setFailedIndices : List FailedIndex -> TypingStats -> TypingStats
+setFailedIndices failedIndexList typingStats =
+  { typingStats | failedIndices = failedIndexList }
+
+setSecondsPassed : SecondsPassed -> TypingStats -> TypingStats
+setSecondsPassed seconds typingStats =
+  { typingStats | secondsPassed = seconds}
+
+asTypingStatsIn : Model -> TypingStats -> Model
+asTypingStatsIn =
+  flip setTypingStats
+
+wordList : Model -> WebData (List Word)
+wordList model =
+    model.wordList
+
+remainWords : Model -> List Word
+remainWords model =
+    model.typingStats.remainWords
+
+typedWords : Model -> List Word
+typedWords model =
+    model.typingStats.typedWords
+
+secondsPassed : Model -> SecondsPassed
+secondsPassed model =
+    model.typingStats.secondsPassed
+
 initModel : Model
 initModel =
-    { correct = False
-    , pristine = True
-    , typedWords = []
-    , remainWords = (splitString "\\s+" generateWords)
-    , currentWord = ""
-    , secondsPassed = 0
-    , wpm = 0
-    , failedIndices = []
+    { typingStats =
+        { correct = False
+        , pristine = True
+        , typedWords = []
+        , remainWords = []
+        , currentWord = ""
+        , secondsPassed = 0
+        , wpm = 0
+        , failedIndices = []
+        }
+    , wordList = RemoteData.Loading
     }
-
-generateWords : String
-generateWords =
-  "Lorem Ipsum is simply dummy text of the printing and typesetting industry. Lorem Ipsum has been the industry's standard dummy text ever since the 1500s, when an unknown printer took a galley of type and scrambled it to make a type specimen book. It has survived not only five centuries, but also the leap into electronic typesetting, remaining essentially unchanged. It was popularised in the 1960s with the release of Letraset sheets containing Lorem Ipsum passages, and more recently with desktop publishing software like Aldus PageMaker including versions of Lorem Ipsum."
