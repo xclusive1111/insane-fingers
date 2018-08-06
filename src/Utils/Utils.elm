@@ -32,10 +32,9 @@ countCharacters xs =
   List.sum <| List.map String.length xs
 
 calcTypingAccuracy : Int -> Int -> Float
-calcTypingAccuracy mistakeCnt totalTypedEntries =
+calcTypingAccuracy a b =
   let
-    accuracy = (toFloat mistakeCnt) / (toFloat totalTypedEntries) * 100
-    accuracyStr = toString <| 100 - accuracy
+    accuracyStr = toString <| (toFloat a) / (toFloat b) * 100
     finalAccuracy =
       case String.split(".") accuracyStr of
         [a, b] -> a ++ "." ++ (String.slice 0 1 b)

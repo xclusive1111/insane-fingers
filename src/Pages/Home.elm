@@ -6,7 +6,7 @@ import Html.Attributes exposing (class, id, src, style, type_, value)
 import Html.Events exposing (onClick, onInput)
 import RemoteData
 import Set
-import Types.Models exposing (Model, Msg(..), Styles, TypingStats)
+import Types.Models exposing (..)
 import Utils.Utils exposing (calcTypingAccuracy, calculatePercent, calculateWPM, countCharacters)
 
 view : Model -> Html Msg
@@ -72,8 +72,8 @@ statsSection stats =
   let
       wpm = toString stats.wpm
       mistakeCnt = (Set.fromList stats.failedIndices) |> Set.size
-      totalTypedEntries = mistakeCnt + (List.length stats.typedWords)
-      acc = toString <| calcTypingAccuracy mistakeCnt totalTypedEntries
+      totalChars = countCharacters stats.typedWords
+      acc = toString <| calcTypingAccuracy (totalChars - mistakeCnt) totalChars
   in
     div [ class "" ]
       [ p [] [ text ("Your speed: " ++ wpm ++ "WPM")]
