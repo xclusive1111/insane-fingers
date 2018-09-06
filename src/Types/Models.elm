@@ -1,7 +1,7 @@
 module Types.Models exposing (..)
 
 import RemoteData exposing (WebData)
-import Time exposing (Time)
+import Time
 
 type alias Word = String
 type alias SecondsPassed = Int
@@ -26,7 +26,7 @@ type alias Model =
 
 type Msg
     = OnTyping Word
-    | OnSecondPassed Time
+    | OnSecondPassed Time.Posix
     | OnFetchWords (WebData (List Word))
     | OnWordsGenerated (Maybe (List Word))
     | Reset
@@ -42,12 +42,12 @@ setCorrect bool typingStats =
   { typingStats | correct = bool }
 
 setTypedWords : List Word -> TypingStats -> TypingStats
-setTypedWords wordList typingStats =
-  { typingStats | typedWords = wordList }
+setTypedWords wl typingStats =
+  { typingStats | typedWords = wl }
 
 setRemainWords : List Word -> TypingStats -> TypingStats
-setRemainWords wordList typingStats =
-  { typingStats | remainWords = wordList }
+setRemainWords wl typingStats =
+  { typingStats | remainWords = wl }
 
 setWPM : WPM -> TypingStats -> TypingStats
 setWPM wpm typingStats =
@@ -70,8 +70,8 @@ setSecondsPassed seconds typingStats =
   { typingStats | secondsPassed = seconds}
 
 asTypingStatsIn : Model -> TypingStats -> Model
-asTypingStatsIn =
-  flip setTypingStats
+asTypingStatsIn model typingStats =
+  setTypingStats typingStats model
 
 wordList : Model -> WebData (List Word)
 wordList model =

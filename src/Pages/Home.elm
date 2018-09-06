@@ -7,7 +7,7 @@ import Html.Events exposing (onClick, onInput)
 import RemoteData
 import Set
 import Types.Models exposing (..)
-import Utils.Utils exposing (calcTypingAccuracy, calculatePercent, calculateWPM, countCharacters)
+import Utils exposing (calcTypingAccuracy, calculatePercent, calculateWPM, countCharacters, getStyles)
 
 view : Model -> Html Msg
 view model =
@@ -42,7 +42,7 @@ render model =
     RemoteData.Success words ->
       [ div [ class "twelve wide computer sixteen wide mobile left aligned column" ]
           [ div [ class "ui segment" ] [ typingProgress model.typingStats ]
-          , div [ class "ui segment", style typingWord ] (getTypingWords model.typingStats)
+          , div ([ class "ui segment"] ++ (getStyles typingWord)) (getTypingWords model.typingStats)
           ]
       , div [ class "eight wide computer sixteen wide mobile column" ]
           [ typingSection model.typingStats
@@ -54,7 +54,7 @@ render model =
               [ div [ class "ui negative message" ]
                   [ i [ class "close icon"] []
                   , div [ class "header" ] [ text "We're sorry we cant't fetch word list for you." ]
-                  , p [] [ text (toString err) ]
+                  , p [] [ text (Debug.toString err) ]
                   ]
               ]
           ]
@@ -70,15 +70,15 @@ typingSection stats =
 statsSection : TypingStats -> Html Msg
 statsSection stats =
   let
-      wpm = toString stats.wpm
+      wpm = String.fromInt stats.wpm
       mistakeCnt = (Set.fromList stats.failedIndices) |> Set.size
       totalChars = countCharacters stats.typedWords
-      acc = toString <| calcTypingAccuracy (totalChars - mistakeCnt) totalChars
+      acc = String.fromFloat <| calcTypingAccuracy (totalChars - mistakeCnt) totalChars
   in
     div [ class "" ]
-      [ p [] [ text ("Your speed: " ++ wpm ++ "WPM")]
+      [ p [] [ text ("Your speed: " ++ wpm ++ " WPM")]
       , p [] [ text ("Accuracy: " ++ acc ++ "%" )]
-      , p [] [ text ("Time: " ++ (toString stats.secondsPassed) ++ " s")]
+      , p [] [ text ("Time: " ++ (String.fromInt stats.secondsPassed) ++ " s")]
       , button [ class "ui icon button", onClick Reset ]
           [ i [ class "big refresh icon" ] [] ]
       ]
@@ -109,16 +109,16 @@ typingProgress stats =
           ]
       , div [ class "twelve wide column"]
           [ div [ class "ui progress success" ]
-            [ div [ class "bar", style [("width", (toString percent) ++ "%")] ]
-                [ div [ class "progress"] [ text ((toString percent) ++ "%")] ]
+            [ div [ class "bar", style "width" ((String.fromInt percent) ++ "%") ]
+                [ div [ class "progress"] [ text ((String.fromInt percent) ++ "%")] ]
             ]
           ]
-      , div [ class "two wide column label" ] [ text ((toString stats.wpm) ++ " WPM") ]
+      , div [ class "two wide column label" ] [ text ((String.fromInt stats.wpm) ++ " WPM") ]
     ]
 
 wrapBySpan : Styles -> String -> Html Msg
 wrapBySpan styles word =
-    span [ style styles ] [ text word ]
+    span (getStyles styles) [ text word ]
 
 wordStyles : Styles -> List String -> List (Html Msg)
 wordStyles styles wordList =

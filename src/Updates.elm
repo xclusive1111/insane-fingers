@@ -3,7 +3,7 @@ module Updates exposing (update)
 import Commands
 import String exposing (startsWith)
 import Types.Models exposing (..)
-import Utils.Utils exposing (calcTypingAccuracy, calculateWPM, countCharacters)
+import Utils exposing (calcTypingAccuracy, calculateWPM, countCharacters)
 
 update : Msg -> Model -> (Model, Cmd Msg)
 update msg model =
@@ -74,10 +74,14 @@ handleOnTyping inputWord model =
 
 handleOnSecondPassed : Model -> (Model, Cmd Msg)
 handleOnSecondPassed model =
-  (model.typingStats
-    |> setSecondsPassed ((secondsPassed model) + 1)
-    |> asTypingStatsIn model
-    , Cmd.none)
+  let
+    newSecondsPassed = (secondsPassed model) + 1
+  in
+    (model.typingStats
+      |> setSecondsPassed newSecondsPassed
+      |> setWPM (calculateWPM model.typingStats.typedWords newSecondsPassed)
+      |> asTypingStatsIn model
+      , Cmd.none)
 
 matchStart : String -> List String -> Bool
 matchStart inputWord remainWords =

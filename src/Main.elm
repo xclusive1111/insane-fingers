@@ -1,8 +1,9 @@
 module Main exposing (..)
 
+import Browser
 import Commands
 import Html exposing (Html)
-import Time exposing (second)
+import Time
 import Types.Models exposing (Model, Msg(..), initModel)
 import Updates exposing (update)
 import Views exposing (view)
@@ -19,13 +20,13 @@ subscriptions model =
   if model.typingStats.pristine then
     Sub.none
   else
-    Time.every second OnSecondPassed
+    Time.every 1000 OnSecondPassed
 
-main : Program Never Model Msg
+main : Program () Model Msg
 main =
-    Html.program
+    Browser.element
         { view = view
-        , init = init
+        , init = \_ -> init
         , update = update
         , subscriptions = subscriptions
         }
