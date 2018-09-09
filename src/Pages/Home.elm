@@ -4,10 +4,11 @@ import Css.Inline exposing (currentWord, negativeWord, positiveWord, typingWord)
 import Html exposing (Html, a, button, div, h1, i, img, input, p, span, text)
 import Html.Attributes exposing (class, id, src, style, type_, value)
 import Html.Events exposing (onClick, onInput)
+import Http
 import RemoteData
 import Set
 import Types.Models exposing (..)
-import Utils exposing (calcTypingAccuracy, calculatePercent, calculateWPM, countCharacters, getStyles)
+import Utils exposing (calcTypingAccuracy, calculatePercent, calculateWPM, countCharacters, decodeErrors, getStyles)
 
 view : Model -> Html Msg
 view model =
@@ -54,7 +55,7 @@ render model =
               [ div [ class "ui negative message" ]
                   [ i [ class "close icon"] []
                   , div [ class "header" ] [ text "We're sorry we cant't fetch word list for you." ]
-                  , p [] [ text (Debug.toString err) ]
+                  , p [] [ text <| (decodeErrors(err) |> List.foldl (\a b -> a ++ "\n" ++ b) "")]
                   ]
               ]
           ]

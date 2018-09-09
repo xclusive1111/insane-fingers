@@ -2,15 +2,40 @@ module Utils exposing (..)
 
 import Html
 import Html.Attributes exposing (style)
-import Regex
+import Http exposing (Body, Error(..), Response)
+import Json.Decode as Decode exposing (Decoder, decodeString, field)
 import String exposing (toFloat)
 import Types.Models exposing (Styles)
 
-splitString : String -> String -> List String
-splitString reg str =
-  Regex.fromString reg
-  |> Maybe.map (\regex -> Regex.split regex str)
-  |> Maybe.withDefault []
+getWords : String -> List String
+getWords = String.words
+
+decodeErrors : Http.Error -> List String
+decodeErrors error =
+    case error of
+        Http.BadStatus response ->
+            response.body
+                |> decodeString (field "errors" errorsDecoder)
+                |> Result.withDefault [ "Server error" ]
+
+        err ->
+            [ "Server error" ]
+
+
+errorsDecoder : Decoder (List String)
+errorsDecoder =
+    Decode.keyValuePairs (Decode.list Decode.string)
+        |> Decode.map (List.concatMap fromPair)
+
+fromPair : ( String, List String ) -> List String
+fromPair ( field, errors ) =
+    List.map (\error -> field ++ " " ++ error) errors
+
+
+getHttpResponseBody : Response Body -> Body
+getHttpResponseBody bodyResponse =
+    case bodyResponse of
+      {url, status, headers, body} -> body
 
 notBlank : String -> Bool
 notBlank str =
