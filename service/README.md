@@ -5,4 +5,4 @@ Start servers in development mode:
 $ npm run dev
 ```
 
-This will start a RESTful API server on port 3000 and a WebSocket server on port 4000
+This will start a server on port 3000 for both RESTful API and WebSocket
