@@ -17,23 +17,24 @@ export class QuoteDb {
   }
 
   public static addQuotes(quotes: Array<QuoteForm>, fn: (err) => void): void {
-    const sql = "INSERT INTO quote(words, added_by) VALUES " +
-      quotes.map(x => `("${QuoteDb.encodeWords(x.words)}", "${x.addedBy}")`).join(",");
+    const values = quotes.map(x => `("${QuoteDb.encodeWords(x.words)}", "${x.addedBy}")`).join(",");
+    const sql = "INSERT INTO quote(words, added_by) VALUES " + values;
+
     Db.using(Db.getDb(QuoteDb.dbPath), (db) => db.run(sql, fn));
   }
 
   public static randomQuote(fn: (err: Error, quote: Quote) => void): void {
-    const getFirst = (db: sqlite.Database) => {
-      const cnt = "SELECT COUNT(*) AS cnt FROM quote";
-      db.get(cnt, (err, row) => {
-        if (err) fn(err, undefined);
-        else {
-          const offset = Math.floor(Api.random(+row.cnt + 1, 0));
-          db.get("SELECT * FROM quote LIMIT 1 OFFSET " + offset,
-            (e: Error, quote: Quote) => fn(e, QuoteDb.decodeQuote(quote)));
-        }
-      })
-    };
+    const cntSql = "SELECT COUNT(*) AS cnt FROM quote";
+    const sqlFn = (offset: number) => "SELECT * FROM quote LIMIT 1 OFFSET " + offset;
+    const randomOffset = (max: number) => Math.floor(Api.random(max - 1, 0));
+
+    const first = (db: sqlite.Database, offset: number) =>
+      db.get(sqlFn(offset), (e: Error, q: Quote) => fn(e, QuoteDb.decodeQuote(q)));
+
+    const getFirst = (db: sqlite.Database) => db.get(cntSql, (err: Error, row: { cnt: number }) => {
+      if (err) fn(err, undefined);
+      else first(db, randomOffset(row.cnt));
+    });
 
     Db.using(Db.getDb(QuoteDb.dbPath), getFirst);
   }

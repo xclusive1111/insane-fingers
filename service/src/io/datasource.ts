@@ -3,11 +3,9 @@ import * as sqlite from 'sqlite3';
 export default class Db {
 
   public static getDb(dbPath: string): sqlite.Database {
-    return new sqlite.Database(dbPath, (err) => {
-      if (err) {
-        console.error(err);
-      }
-      console.log("Open connection to path: " + dbPath);
+    return new sqlite.Database(dbPath, (err: Error) => {
+      if (err) console.error(err);
+      else console.log("Open connection to path: " + dbPath);
     });
   }
 
