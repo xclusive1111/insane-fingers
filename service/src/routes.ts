@@ -1,17 +1,16 @@
-import {Request, Response} from "express";
 import {QuoteController} from "./controller/quote-controller";
-import {WsServer} from "./controller/ws-controller";
 
 export class Routes {
   public quoteController: QuoteController = new QuoteController();
-  public wsServer: WsServer = new WsServer();
 
   public routes(app): void {
-    app.route("/ping").get((req: Request, res: Response) => {
-      res.status(200).send({ message: 'Pong !!' })
-    });
+    app.route("/ping").get(this.quoteController.ping);
 
-    app.route("/add_quote").post(this.quoteController.addQuote);
+    app.route("/quotes/add").post(this.quoteController.addQuotes);
+
+    app.route("/quotes").get(this.quoteController.getQuotes);
+
+    app.route("/quotes/random").get(this.quoteController.random);
   }
 }
 

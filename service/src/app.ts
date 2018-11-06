@@ -26,7 +26,7 @@ export default class App {
   public start(port: number): void {
     this.server.listen(port, () => {
       console.log("Express server listening on port " + port);
-    })
+    });
     this.io.on('connection', (socket: any) => {
       socket.broadcast.emit('A client connected');
       socket.emit('news', { hello: 'world' });

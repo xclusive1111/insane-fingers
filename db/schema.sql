@@ -1,0 +1,5 @@
+CREATE TABLE quote(
+  id INTEGER PRIMARY KEY AUTOINCREMENT,
+  words TEXT NOT NULL, 
+  added_by VARCHAR(255)
+);
